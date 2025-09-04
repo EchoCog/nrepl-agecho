@@ -2,7 +2,7 @@ package nrepl;
 
 /**
  * Java facade for the C side of the libnrepl JVMTI agent. Currently used to
- * stop threads on JDK20+.
+ * stop threads on JDK21+.
  */
 public class JvmtiAgent {
 
