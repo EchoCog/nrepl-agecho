@@ -405,7 +405,7 @@
                                         "client-version" "The nREPL client version. e.g. \"1.2.3\""}
                              :returns {"new-session" "The ID of the new session."}}
                             "interrupt"
-                            {:doc "Attempts to interrupt some executing request. When interruption succeeds, the thread used for execution is killed, and a new thread spawned for the session. While the session middleware ensures that Clojure dynamic bindings are preserved, other ThreadLocals are not. Hence, when running code intimately tied to the current thread identity, it is best to avoid interruptions. On Java 20 and later, if `-Djdk.attach.allowAttachSelf` is enabled, the JVMTI agent will be used to attempt to stop the thread."
+                            {:doc "Attempts to interrupt some executing request. When interruption succeeds, the thread used for execution is killed, and a new thread spawned for the session. While the session middleware ensures that Clojure dynamic bindings are preserved, other ThreadLocals are not. Hence, when running code intimately tied to the current thread identity, it is best to avoid interruptions. On Java 21 and later, if `-Djdk.attach.allowAttachSelf` is enabled, the JVMTI agent will be used to attempt to stop the thread."
                              :requires {"session" "The ID of the session used to start the request to be interrupted."}
                              :optional {"interrupt-id" "The opaque message ID sent with the request to be interrupted."}
                              :returns {"status" "'interrupted' if a request was identified and interruption will be attempted
