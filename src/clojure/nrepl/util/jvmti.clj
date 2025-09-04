@@ -41,13 +41,21 @@
   (VirtualMachine/attach (str (.pid (ProcessHandle/current)))))
 
 (defn- load-libnrepl-agent []
-  (.loadAgentPath (attach-self) @libnrepl-path))
+  (try
+    (.loadAgentPath (attach-self) @libnrepl-path)
+    (catch Exception e
+      (throw (ex-info "Failed to load nREPL JVMTI agent" 
+                      {:libnrepl-path @libnrepl-path} e)))))
 
 (def ^:private agent-loaded (delay (load-libnrepl-agent)))
 
 (defn stop-thread
   "Stop the given `thread` using JVMTI StopThread function. Risks state
-  corruption. Should not be used prior to JDK20."
+  corruption. Should not be used prior to JDK21."
   [thread]
-  @agent-loaded
-  (JvmtiAgent/stopThread thread))
+  (try
+    @agent-loaded
+    (JvmtiAgent/stopThread thread)
+    (catch Exception e
+      (throw (ex-info "Failed to stop thread using JVMTI agent" 
+                      {:thread (.getName thread)} e)))))

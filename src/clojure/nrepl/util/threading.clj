@@ -48,12 +48,15 @@
           0 (thread-factory "nREPL-thread-reaper-%d"))))
 
 (defn- jvmti-stop-thread [t]
-  ((misc/requiring-resolve 'nrepl.util.jvmti/stop-thread) t))
+  (try
+    ((misc/requiring-resolve 'nrepl.util.jvmti/stop-thread) t)
+    (catch Exception e
+      (misc/log "Failed to stop thread using JVMTI agent:" (.getMessage e)))))
 
 (defn- try-stop-thread [^Thread t]
   (cond
-    (<= misc/java-version 19) (.stop t)
-    ;; Since JDK20, Thread.stop() no longer works. We must resort to using
+    (<= misc/java-version 20) (.stop t)
+    ;; Since JDK21, Thread.stop() no longer works. We must resort to using
     ;; JVMTI native agent which luckily still supports Stop Thread command.
     ;; Whether this is more dangerous than calling Thread.stop() in earlier
     ;; JDKs is unknown, but assume the worst and never use this if you can't
@@ -62,7 +65,11 @@
 
     (not (misc/attach-self-enabled?))
     (misc/log "Cannot stop thread on JDK21+ without -Djdk.attach.allowAttachSelf"
-              "enabled, see https://nrepl.org/nrepl/installation.html#jvmti.")))
+              "enabled, see https://nrepl.org/nrepl/installation.html#jvmti.")
+
+    :else
+    (misc/log "Cannot stop thread on JDK21+ - JVMTI agent is disabled."
+              "Set :enable-jvmti-agent true in nREPL config to enable it.")))
 
 (def ^:private force-stop-delay-ms 5000)
 
